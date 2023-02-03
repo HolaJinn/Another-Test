@@ -1,0 +1,11 @@
+2023-02-03 10:21:40.975292Z: [Thread 4540] (Msg 1/1) BIP1990I: L'initialisation du serveur d'intégration 'workdir' commence ; version '12.0.5.0' (64 bits). 
+2023-02-03 10:21:41.013288Z: [Thread 4540] (Msg 1/1) BIP9905I: Initialisation des gestionnaires de ressources. 
+2023-02-03 10:22:25.316066Z: [Thread 4540] (Msg 1/1) BIP9906I: Lecture des ressources déployées. 
+2023-02-03 10:22:25.328158Z: [Thread 4540] (Msg 1/1) BIP9907I: Initialisation des ressources déployées. 
+2023-02-03 10:22:25.334416Z: [Thread 4540] (Msg 1/1) BIP2155I: Prêt à 'Initialize' la ressource déployée 'HTTPInputApplication' de type 'Application'. 
+2023-02-03 10:22:25.519046Z: [Thread 4540] (Msg 1/1) BIP2155I: Prêt à 'Initialize' la ressource déployée 'HTTPInputApplication_Test' de type 'TestProjectType'. 
+2023-02-03 10:22:27.505030Z: [Thread 4540] (Msg 1/1) BIP2155I: Prêt à 'Start' la ressource déployée 'HTTPInputApplication' de type 'Application'. 
+2023-02-03 10:22:42.870452Z: [Thread 11268] (Msg 1/1) BIP2866I: La sécurité d'administration de IBM App Connect Enterprise est inactive. 
+2023-02-03 10:22:42.888860Z: [Thread 11268] (Msg 1/1) BIP3144S: Une erreur s'est produite au cours du démarrage du programme d'écoute HTTP : le port TCPIP spécifié (7600) est déjà utilisé. 
+2023-02-03 10:22:42.895836Z: [Thread 4540] (Msg 1/1) BIP9910I: Running tests in test project 'HTTPInputApplication_Test'. 
+2023-02-03 10:22:43.417264Z: [Thread 4540] (Msg 1/1) BIP9911I: Running tests in test project 'HTTPInputApplication_Test' completed successfully. 

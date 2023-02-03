@@ -1,0 +1,161 @@
+Skip to content
+Search or jump to…
+Pull requests
+Issues
+Codespaces
+Marketplace
+Explore
+ 
+@HolaJinn 
+HolaJinn
+/
+Simple-App
+Public
+Fork your own copy of HolaJinn/Simple-App
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security
+Insights
+Settings
+Simple-App/.github/workflows/main.yml
+@HolaJinn
+HolaJinn Update main.yml
+Latest commit d460eb5 last week
+ History
+ 1 contributor
+115 lines (94 sloc)  6.2 KB
+
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a set of commands using the runners shell
+      - name: Download ACE image
+        run: |
+          ########################################################################
+          # 
+          # We move the source to the build directory to make sure it is not in
+          # the same directory as the downloaded install image. If the source 
+          # stays where it is, then ibmint tries to scan it for projects!
+          # 
+          ########################################################################
+          echo "Moving source to the build directory"
+          mkdir build
+          mv * build || /bin/true
+          
+          echo 'build'
+          
+          ########################################################################
+          # 
+          # Download ace-minimal image; could use ace-minimal-build but in our
+          # case we already have Gradle and the various utilities contained in 
+          # the build image, so we download the base image because it's smaller.
+          # 
+          ########################################################################
+          curl -so moby-download-frozen-image-v2.sh https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-image-v2.sh
+          mkdir ace-minimal-download
+          bash moby-download-frozen-image-v2.sh ace-minimal-download tdolby/experimental:ace-minimal-12.0.4.0-alpine
+          mkdir ace-minimal-image-unzip
+          cd ace-minimal-download && grep layer.tar manifest.json | tr -d '"' | tr -d ',' | xargs -n 1 tar -C ../ace-minimal-image-unzip -xf && cd - && rm -rf ace-minimal-download
+          # Not actually running on Alpine, so we undo a hack
+          sed -i 's/\/bin\/mksh/\/bin\/bash/g' ace-minimal-image-unzip/opt/ibm/ace-12/ace ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/mqsicreateworkdir ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/mqsipackagebar
+          ########################################################################
+          # 
+          # Set up ACE environment and ensure downloaded image works
+          # 
+          ########################################################################
+          export LICENSE=accept
+          export MQSI_WORKPATH=$PWD/ace-minimal-image-unzip/var/mqsi
+          . ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/mqsiprofile
+          mqsilist
+          #ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/ibmint package --input-path ./Test.App --compile-maps-and-schemas --project --overrides-file ./Test.App/properties/DEV.properties --output-bar-file ./testbar.bar
+      
+      - name: build bar
+        run: |
+          export LICENSE=accept
+          export MQSI_WORKPATH=$PWD/ace-minimal-image-unzip/var/mqsi
+          . ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/mqsiprofile
+                    
+          ### This command works for building bar file and overriding properties ###
+          ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/mqsipackagebar -w . -a build/GeneratedBarFiles/testbar.bar -o build/HTTPInputApplication/HTTPInputMessageFlow.msgflow -k ./build/HTTPInputApplication
+          ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/mqsiapplybaroverride -b build/GeneratedBarFiles/testbar.bar -p build/properties/DEV.properties -o build/GeneratedBarFiles/testbar_DEV.bar -r
+          ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/mqsiapplybaroverride -b build/GeneratedBarFiles/testbar.bar -p build/properties/QA.properties -o build/GeneratedBarFiles/testbar_QA.bar -r
+      
+          ls -al ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/
+      
+      - name: Unit Testing
+        run: | 
+          export LICENSE=accept
+          export MQSI_WORKPATH=$PWD/ace-minimal-image-unzip/var/mqsi
+          . ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/mqsiprofile
+          
+          ls -al 
+          ls -al build
+          
+          #ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/ibmint package --input-path build/HTTPInputApplicationTest --output-bar-file unittest.bar
+          
+          ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/mqsipackagebar -w . -a build/GeneratedBarFiles/unittest.bar -o build/HTTPInputApplicationTest -k ./build/HTTPInputApplicationTest
+          #ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/ibmint package --input-bar-file build/GeneratedBarFiles/unittest.bar --output-bar-file build/GeneratedBarFiles/unittest.bar
+          
+          
+          
+          ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/mqsicreateworkdir workdir
+          ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/ibmint deploy --input-bar-file ./build/GeneratedBarFiles/testbar.bar --output-work-dir workdir
+          ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/ibmint deploy --input-bar-file ./build/GeneratedBarFiles/unittest.bar --output-work-dir workdir
+          IntegrationServer --work-dir workdir --test-project ./build/HTTPInputApplication_Test --start-msgflows false
+          
+          #git config --global user.name "HolaJinn"
+          #git config --global user.email "HolaJinn@users.noreply.github.com"
+          #git add ./build/GeneratedBarFiles/*
+          #git commit -m "Add bar files"
+          #git push
+          
+          #ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/ibmint package --input-path ./build/Test.App/ --output-bar-file ./testbar.bar --do-not-compile-java
+          #pwd
+          #ls -al
+          #echo "listing"
+          #ls -al ./build/Test.App
+          #ls -al $MQSI_WORKPATH
+     
+Footer
+© 2023 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+Simple-App/main.yml at master · HolaJinn/Simple-App
