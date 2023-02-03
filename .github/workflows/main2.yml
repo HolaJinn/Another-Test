@@ -42,6 +42,7 @@ jobs:
           echo 'build'
           
           java -version
+          apt-get install openjdk-8-jdk
           
           ########################################################################
           # 
