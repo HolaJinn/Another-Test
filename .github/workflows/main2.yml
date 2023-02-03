@@ -95,7 +95,7 @@ jobs:
           
           pwd
           
-          ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/ibmint package --input-path build/HTTPInputApplication_Test --output-bar-file unittest.bar
+          ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/ibmint package --input-path build/HTTPInputApplication_Test --do-not-compile-java --output-bar-file unittest.bar
           
           #ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/mqsipackagebar -w . -a build/GeneratedBarFiles/unittest.bar -o build/HTTPInputApplicationTest -k ./build/HTTPInputApplicationTest
           #ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/ibmint package --input-bar-file build/GeneratedBarFiles/unittest.bar --output-bar-file build/GeneratedBarFiles/unittest.bar
