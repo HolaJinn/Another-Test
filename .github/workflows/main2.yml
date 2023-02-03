@@ -41,9 +41,10 @@ jobs:
           
           echo 'build'
           
-          java -version
           sudo apt-get update
-          sudo apt-get install openjdk-8-jdk
+          #sudo apt-get install openjdk-8-jdk
+          sudo update-alternatives --set java /usr/lib/jvm/jdk1.8.0_321/bin/java
+          java -version
 
           
           ########################################################################
