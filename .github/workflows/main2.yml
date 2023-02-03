@@ -41,6 +41,8 @@ jobs:
           
           echo 'build'
           
+          java -version
+          
           ########################################################################
           # 
           # Download ace-minimal image; could use ace-minimal-build but in our
