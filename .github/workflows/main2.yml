@@ -93,6 +93,8 @@ jobs:
           ls -al 
           ls -al build
           
+          pwd
+          
           ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/ibmint package --input-path build/HTTPInputApplication_Test --output-bar-file unittest.bar
           
           #ace-minimal-image-unzip/opt/ibm/ace-12/server/bin/mqsipackagebar -w . -a build/GeneratedBarFiles/unittest.bar -o build/HTTPInputApplicationTest -k ./build/HTTPInputApplicationTest
